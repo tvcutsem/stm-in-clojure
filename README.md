@@ -30,11 +30,9 @@ Clojure can find the generated exception class.
 Slides
 ------
 
-A slide set accompanying this code can be found on [SlideShare](http://www.slideshare.net/tvcutsem/) (embedded below).
+A slide set accompanying this code can be found on [SlideShare](http://www.slideshare.net/tvcutsem/stm-inclojure).
 The slides and code were originally developed for my Masters course on
 [multicore programming](http://soft.vub.ac.be/~tvcutsem/multicore).
-
-<div style="width:425px" id="__ss_7630493"><strong style="display:block;margin:12px 0 4px"><a href="http://www.slideshare.net/tvcutsem/stm-inclojure" title="Stm in-clojure">Stm in-clojure</a></strong><object id="__sse7630493" width="425" height="355"><param name="movie" value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=stm-in-clojure-110414130822-phpapp02&stripped_title=stm-inclojure&userName=tvcutsem" /><param name="allowFullScreen" value="true"/><param name="allowScriptAccess" value="always"/><embed name="__sse7630493" src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=stm-in-clojure-110414130822-phpapp02&stripped_title=stm-inclojure&userName=tvcutsem" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="355"></embed></object><div style="padding:5px 0 12px">View more <a href="http://www.slideshare.net/">presentations</a> from <a href="http://www.slideshare.net/tvcutsem">Tom Van Cutsem</a>.</div></div>
 
 Example
 -------
@@ -42,6 +40,7 @@ Example
 MC-STM's API mimics Clojure's built-in API. Just prefix all core functions such as `dosync`, 
 `ref` and `alter` with `mc-`:
 
+    (use 'stm.v2-mvcc)
     (use 'clojure.contrib.test-is)
 
     (defn transfer [amount from to]
