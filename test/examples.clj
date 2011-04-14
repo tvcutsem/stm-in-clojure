@@ -33,11 +33,11 @@
   (:use clojure.contrib.test-is)
   (:import (java.util.concurrent Executors)))
 
-; (use 'stm.v0-native)
+(use 'stm.v0-native)
 ; (use 'stm.v1-simple)
 ; (use 'stm.v2-mvcc)
 ; (use 'stm.v3-mvcc-commute)
-(use 'stm.v4-mvcc-fine-grained)
+; (use 'stm.v4-mvcc-fine-grained)
 
 ;; === Bank account transfer ===
 
@@ -90,6 +90,39 @@
    (is (every? (fn [r] (= r 550000)) res))))
 
 
+;; === Vector swap ===
+
+; From http://clojure.org/refs by Rich Hickey:
+; In this example a vector of references to vectors is created, each containing
+; (initially sequential) unique numbers. Then a set of threads are started that
+; repeatedly select two random positions in two random vectors and swap them,
+; in a transaction. No special effort is made to prevent the inevitable
+; conflicts other than the use of transactions.
+(defn vector-swap [nvecs nitems nthreads niters]
+  (let [vec-refs (vec (map (comp mc-ref vec)
+                           (partition nitems (range (* nvecs nitems)))))
+        swap #(let [v1 (rand-int nvecs)
+                    v2 (rand-int nvecs)
+                    i1 (rand-int nitems)
+                    i2 (rand-int nitems)]
+                (mc-dosync
+                 (let [temp (nth (mc-deref (vec-refs v1)) i1)]
+                   (mc-alter (vec-refs v1) assoc i1
+                     (nth (mc-deref (vec-refs v2)) i2))
+                   (mc-alter (vec-refs v2) assoc i2 temp))))
+        check-distinct #(do
+                 ; (prn (map mc-deref vec-refs))
+                 (is (= (* nvecs nitems)
+                       (count (distinct
+                                (apply concat (map mc-deref vec-refs)))))))]
+    (check-distinct)
+    (dorun (apply pcalls (repeat nthreads #(dotimes [_ niters] (swap)))))
+    (check-distinct)))
+
+(deftest vector-swap-test []
+  (time (vector-swap 100 10 10 100000)))
+
+
 (run-tests)
 
 ; -----------------------------------------------------
@@ -106,3 +139,10 @@
 ; v2-mvcc:              "Elapsed time: 10714.035 msecs" (x3.92)
 ; v3-mvcc-commute:      "Elapsed time: 9751.687 msecs"  (x3.57)
 ; v4-mvcc-fine-grained: "Elapsed time: 16174.881 msecs" (x5.92)
+
+; vector-swap:          
+; v0-native:            "Elapsed time: 5180.694 msecs"
+; v1-simple:            "Elapsed time: 16037.275 msecs" (x3.09)
+; v2-mvcc:              "Elapsed time: 29760.412 msecs" (x5.74)
+; v3-mvcc-commute:      "Elapsed time: 31856.438 msecs" (x6.14)
+; v4-mvcc-fine-grained: "Elapsed time: 21752.742 msecs" (x4.19)
