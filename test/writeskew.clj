@@ -37,7 +37,9 @@
 
 (def count-write-skews (atom 0))
 
-; write skew example
+; write skew example, inspiration taken from R. Mark Volkmann's article:
+; http://java.ociweb.com/mark/stm/article.html
+
 ; constraint: @cats + @dogs <= 3
 ; 2 threads: john, mary
 ; @cats = 1, @dogs = 1
