@@ -17,18 +17,17 @@ recognize that refs can be updated in a coordinated way via software transaction
 For ease of understanding, we developed the meta-circular STM in a series of 
 versions, each more complicated than the previous one:
 
-- [`v1_simple.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v1_simple.clj): simple revision-no based STM, without support for "internal" consistency.
+- [`v1_simple.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v1_simple.clj): simple revision-number based STM, no support for "internal" consistency (that is: transactions may have an inconsistent view of the global ref state).
 - [`v2_mvcc.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v2_mvcc.clj): [MVCC](http://en.wikipedia.org/wiki/Multiversion_concurrency_control)-based STM with 
-  coarse-grained lock (one commit at a time)
-- [`v3_mvcc_commute.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v3_mvcc_commute.clj): MVCC-based STM with support for [commute](http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/commute) and [ensure](http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/ensure)
-- [`v4_mvcc_fine_grained.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v4_mvcc_fine_grained.clj): MVCC-based STM with fine-grained locking (supporting concurrent commits)
+  coarse-grained lock (only one transaction can commit at a time)
+- [`v3_mvcc_commute.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v3_mvcc_commute.clj): MVCC-based STM with support for [commute](http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/commute) and [ensure](http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/ensure).
+- [`v4_mvcc_fine_grained.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v4_mvcc_fine_grained.clj): MVCC-based STM with fine-grained locking (each ref is guarded by its own lock. Transactions that modify disjoint sets of refs can commit concurrently).
 
 My primary goal has been clarity of code, not performance. From crude micro-benchmarks,
 my rough estimate is that these meta-circular implementations are 3-6x slower than the built-in
 STM.
 
-Before loading the example files, make sure you compiled `stm/RetryEx.clj` so that
-Clojure can find the generated exception class.
+Before loading the example files, make sure you compiled `stm/RetryEx.clj` such that the generated exception class is on the classpath.
 
 Slides
 ------
@@ -69,3 +68,4 @@ Acknowledgements
 ----------------
 
 I was inspired by Daniel Spiwak's blog post on [STM in Scala](http://www.codecommit.com/blog/scala/software-transactional-memory-in-scala).
+Thanks also to R. Mark Volkmann for his excellent article on [STM in Clojure](http://java.ociweb.com/mark/stm/article.html).

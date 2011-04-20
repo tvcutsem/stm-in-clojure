@@ -52,15 +52,17 @@
 ; maximum amount of older values stored, per mc-ref
 (def MAX_HISTORY 10)
 
-(defn make-transaction []
+(defn make-transaction
   "create and return a new transaction data structure"
+  []
   { :read-point @GLOBAL_WRITE_POINT,
     :in-tx-values (atom {}), ; map: ref -> any value
     :written-refs (atom #{}) }) ; set of refs
 
-(defn find-value-no-later-than [history-chain read-pt]
+(defn find-value-no-later-than
   "returns value of a pair in history-chain whose write-pt <= read-pt,
    or nil if no such pair exists"
+  [history-chain read-pt]
   (some (fn [pair]
           (if (and pair (<= (:write-point pair) read-pt))
             (:value pair))) history-chain))
@@ -68,11 +70,14 @@
 ; history lists of mc-refs are ordered youngest to eldest
 (def most-recent first)
 
-(defn tx-retry []
+(defn tx-retry
+  "immediately abort and retry the current transaction"
+  []
   (throw (new stm.RetryEx)))
 
-(defn tx-read [tx mc-ref]
+(defn tx-read
   "read the value of ref inside transaction tx"
+  [tx mc-ref]
   (let [in-tx-values (:in-tx-values tx)]
     (if (contains? @in-tx-values mc-ref)
       (@in-tx-values mc-ref) ; return the in-tx-value
@@ -84,8 +89,9 @@
         (swap! in-tx-values assoc mc-ref in-tx-value) ; cache the value
         in-tx-value)))) ; save and return the ref's value
 
-(defn tx-write [tx mc-ref val]
+(defn tx-write
   "write val to ref inside transaction tx"
+  [tx mc-ref val]
   (swap! (:in-tx-values tx) assoc mc-ref val)
   (swap! (:written-refs tx) conj mc-ref)
   val)
@@ -95,8 +101,9 @@
 ; all threads share the same root-binding, so will acquire the same lock
 (def COMMIT_LOCK (new java.lang.Object))
 
-(defn tx-commit [tx]
+(defn tx-commit
   "returns normally if tx committed successfully, throws RetryEx otherwise"
+  [tx]
   (let [written-refs @(:written-refs tx)]
     (when (not (empty? written-refs))
       (locking COMMIT_LOCK
@@ -123,8 +130,9 @@
 ; The inner let either returns the value of the transaction, wrapped in a map,
 ; or nil, to indicate that the transaction must be retried.
 ; The outer let tests for nil and if so, calls the function tail-recursively
-(defn tx-run [tx fun]
+(defn tx-run
   "runs zero-argument fun as the body of transaction tx."
+  [tx fun]
   (let [res (binding [*current-transaction* tx]
               (try
                 (let [result (fun)]

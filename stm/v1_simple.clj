@@ -52,15 +52,17 @@
 
 (def NEXT_TRANSACTION_ID (atom 0))
 
-(defn make-transaction []
+(defn make-transaction
   "create and return a new transaction data structure"
+  []
   { :id (swap! NEXT_TRANSACTION_ID inc),
     :in-tx-values (atom {}),    ; map: ref -> any value
     :written-refs (atom #{}),   ; set of refs
     :last-seen-rev (atom {}) }) ; map: ref -> revision id
 
-(defn tx-read [tx ref]
+(defn tx-read
   "read the value of ref inside transaction tx"
+  [tx ref]
   (let [in-tx-values (:in-tx-values tx)]
     (if (contains? @in-tx-values ref)
       (@in-tx-values ref) ; return the in-tx-value
@@ -73,8 +75,9 @@
         (swap! (:last-seen-rev tx) assoc ref read-revision)
         in-tx-value)))) ; save and return the ref's value
 
-(defn tx-write [tx ref val]
+(defn tx-write
   "write val to ref inside transaction tx"
+  [tx ref val]
   (swap! (:in-tx-values tx) assoc ref val)
   (swap! (:written-refs tx) conj ref)
   (if (not (contains? @(:last-seen-rev tx) ref))
@@ -87,8 +90,9 @@
 ; all threads share the same root-binding, so will acquire the same lock
 (def COMMIT_LOCK (new java.lang.Object))
 
-(defn tx-commit [tx]
+(defn tx-commit
   "returns a boolean indicating whether tx committed successfully"
+  [tx]
   (let [validate
         (fn [refs]
           (every? (fn [ref]
@@ -106,8 +110,9 @@
             :revision (:id tx) )))
       success))))
 
-(defn tx-run [tx fun]
+(defn tx-run
   "runs zero-argument fun as the body of transaction tx"
+  [tx fun]
   (let [result (binding [*current-transaction* tx] (fun))]
     (if (tx-commit tx)
         result ; commit succeeded, return result

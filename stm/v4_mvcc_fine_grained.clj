@@ -47,17 +47,19 @@
 ; maximum amount of older values stored, per mc-ref
 (def MAX_HISTORY 10)
 
-(defn make-transaction []
+(defn make-transaction
   "create and return a new transaction data structure"
+  []
   { :read-point @GLOBAL_WRITE_POINT,
     :in-tx-values (atom {}), ; map: ref -> any value
     :written-refs (atom #{}), ; set of written-to refs
     :commutes (atom {}), ; map: ref -> seq of commute-fns
     :ensures (atom #{}) }) ; set of ensure-d refs
 
-(defn find-value-no-later-than [history-chain read-pt]
+(defn find-value-no-later-than
   "returns value of a pair in history-chain whose write-pt <= read-pt,
    or nil if no such pair exists"
+  [history-chain read-pt]
   (some (fn [pair]
           (if (and pair (<= (:write-point pair) read-pt))
             (:value pair))) history-chain))
@@ -66,11 +68,14 @@
 (defn most-recent-value [ref]
   (:value (first @(:history-list ref))))
 
-(defn tx-retry []
+(defn tx-retry
+  "immediately abort and retry the current transaction"
+  []
   (throw (new stm.RetryEx)))
 
-(defn tx-read [tx ref]
+(defn tx-read
   "read the value of ref inside transaction tx"
+  [tx ref]
   (let [in-tx-values (:in-tx-values tx)]
     (if (contains? @in-tx-values ref)
       (@in-tx-values ref) ; return the in-tx-value
@@ -85,8 +90,9 @@
         (swap! in-tx-values assoc ref in-tx-value) ; cache the value
         in-tx-value)))) ; save and return the ref's value
 
-(defn tx-write [tx ref val]
+(defn tx-write
   "write val to ref inside transaction tx"
+  [tx ref val]
   ; can't set a ref after it has already been commuted
   (if (contains? @(:commutes tx) ref)
     (throw (IllegalStateException. "can't set after commute on " ref)))
@@ -94,13 +100,15 @@
   (swap! (:written-refs tx) conj ref)
   val)
 
-(defn tx-ensure [tx ref]
+(defn tx-ensure
   "ensure ref inside transaction tx"
+  [tx ref]
   ; mark this ref as being ensure-d
   (swap! (:ensures tx) conj ref))
 
-(defn tx-commute [tx ref fun args]
+(defn tx-commute
   "commute ref inside transaction tx"
+  [tx ref fun args]
   ; apply fun to the in-tx-value
   ; or the most recent value if not read/written before
   (let [in-tx-values @(:in-tx-values tx)
@@ -117,8 +125,9 @@
                                     (commutes ref)))))
     res))
 
-(defn with-ref-locks-do [refs fun]
+(defn with-ref-locks-do
   "acquires the write-lock on all refs, then executes fun"
+  [refs fun]
   (if (empty? refs)
     (fun)
     (locking (:lock (first refs))
@@ -129,8 +138,9 @@
 ; (could store mc-refs in a (sorted-set), obviates the need for explicit sorting
 ; during commit, but initial experiments suggest that the sorting step
 ; is not the bottleneck)
-(defn tx-commit [tx]
+(defn tx-commit
   "returns normally if tx committed successfully, throws RetryEx otherwise"
+  [tx]
   (let [written-refs @(:written-refs tx)
         ensured-refs @(:ensures tx)
         commuted-refs @(:commutes tx)]
@@ -173,8 +183,9 @@
 ; The inner let either returns the value of the transaction, wrapped in a map,
 ; or nil, to indicate that the transaction must be retried.
 ; The outer let tests for nil and if so, calls the function tail-recursively
-(defn tx-run [tx fun]
+(defn tx-run
   "runs zero-argument fun as the body of transaction tx."
+  [tx fun]
   (let [res (binding [*current-transaction* tx]
               (try
                 (let [result (fun)]

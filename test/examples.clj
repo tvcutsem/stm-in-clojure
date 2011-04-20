@@ -80,7 +80,7 @@
     (.shutdown pool)
     (map mc-deref refs)))
 
-(deftest contention-test []
+(deftest contention-test
   ; 10 threads increment each of 10 refs 10000 times
   ; each ref should be incremented by 550000 in total = 
   ;   (* 10000 (+ 1 2 3 4 5 6 7 8 9 10))
@@ -119,7 +119,7 @@
     (dorun (apply pcalls (repeat nthreads #(dotimes [_ niters] (swap)))))
     (check-distinct)))
 
-(deftest vector-swap-test []
+(deftest vector-swap-test
   (time (vector-swap 100 10 10 100000)))
 
 
