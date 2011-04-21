@@ -50,7 +50,7 @@ MC-STM's API mimics Clojure's built-in API. Just prefix all core functions such 
         (mc-alter from - amount)
         (mc-alter to + amount)))
 
-    (deftest transfer-test []
+    (deftest transfer-test
       (def accountA (mc-ref 1500))
       (def accountB (mc-ref 200))
 
@@ -69,3 +69,12 @@ Acknowledgements
 
 I was inspired by Daniel Spiwak's blog post on [STM in Scala](http://www.codecommit.com/blog/scala/software-transactional-memory-in-scala).
 Thanks also to R. Mark Volkmann for his excellent article on [STM in Clojure](http://java.ociweb.com/mark/stm/article.html).
+
+Feedback
+--------
+
+I welcome any feedback on possible improvements to this code, especially
+with respect to coding style, Clojure idioms, performance improvements, etc.
+
+E-mail can be sent to my `tomvc.be` gmail account, or you can post a message on
+Twitter ([@tvcutsem](http://twitter.com/tvcutsem)).
