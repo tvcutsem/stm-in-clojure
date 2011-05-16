@@ -59,13 +59,13 @@
     :in-tx-values (atom {}), ; map: ref -> any value
     :written-refs (atom #{}) }) ; set of refs
 
-(defn find-value-no-later-than
-  "returns value of a pair in history-chain whose write-pt <= read-pt,
-   or nil if no such pair exists"
+(defn find-entry-before-or-on
+  "returns an entry in history-chain whose write-pt <= read-pt,
+   or nil if no such entry exists"
   [history-chain read-pt]
   (some (fn [pair]
           (if (and pair (<= (:write-point pair) read-pt))
-            (:value pair))) history-chain))
+            pair)) history-chain))
 
 ; history lists of mc-refs are ordered youngest to eldest
 (def most-recent first)
@@ -81,13 +81,14 @@
   (let [in-tx-values (:in-tx-values tx)]
     (if (contains? @in-tx-values mc-ref)
       (@in-tx-values mc-ref) ; return the in-tx-value
-      ; search the history chain for a value with write-point <= tx's read-point
-      (let [in-tx-value (find-value-no-later-than @mc-ref (:read-point tx))]
-        (if (not in-tx-value)
-          ; if such a value was not found, retry
+      ; search the history chain for entry with write-point <= tx's read-point
+      (let [ref-entry (find-entry-before-or-on @mc-ref (:read-point tx))]
+        (if (not ref-entry)
+          ; if such an entry was not found, retry
           (tx-retry))
-        (swap! in-tx-values assoc mc-ref in-tx-value) ; cache the value
-        in-tx-value)))) ; save and return the ref's value
+        (let [in-tx-value (:value ref-entry)]
+          (swap! in-tx-values assoc mc-ref in-tx-value) ; cache the value
+          in-tx-value))))) ; save and return the ref's value
 
 (defn tx-write
   "write val to ref inside transaction tx"
