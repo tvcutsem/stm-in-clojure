@@ -24,8 +24,13 @@ versions, each more complicated than the previous one:
 - [`v4_mvcc_fine_grained.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v4_mvcc_fine_grained.clj): MVCC-based STM with fine-grained locking (each ref is guarded by its own lock. Transactions that modify disjoint sets of refs can commit concurrently).
 
 My primary goal has been clarity of code, not performance. From crude micro-benchmarks,
-my rough estimate is that these meta-circular implementations are 3-6x slower than the built-in
-STM.
+my rough estimate is that these meta-circular implementations are 3-6x slower than the 
+built-in STM.
+
+If you're interested in finding out the key principles behind MVCC, upon which Clojure's 
+STM implementation is based, I suggest studying
+[`version 2`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v2_mvcc.clj). 
+It's less than 200 LOC of Clojure code.
 
 Before loading the example files, make sure you compiled `stm/RetryEx.clj` such that the generated exception class is on the classpath.
 
