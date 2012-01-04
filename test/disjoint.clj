@@ -32,9 +32,10 @@
 ;(use 'stm.v0-native)
 ;(use 'stm.v1-simple)
 ;(use 'stm.v2-mvcc)
-(use 'stm.v3-mvcc-commute)
+;(use 'stm.v3-mvcc-commute)
 ;(use 'stm.v4-mvcc-fine-grained)
-  
+(use 'stm.v5-mvcc-fine-grained-barging)
+ 
 (def count-illegal-states (atom 0))
 
 ; T1 and T2 update disjoint sets of references

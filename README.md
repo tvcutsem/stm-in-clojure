@@ -22,6 +22,7 @@ versions, each more complicated than the previous one:
   coarse-grained lock (only one transaction can commit at a time)
 - [`v3_mvcc_commute.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v3_mvcc_commute.clj): MVCC-based STM with support for [commute](http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/commute) and [ensure](http://clojure.github.com/clojure/clojure.core-api.html#clojure.core/ensure).
 - [`v4_mvcc_fine_grained.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v4_mvcc_fine_grained.clj): MVCC-based STM with fine-grained locking (each ref is guarded by its own lock. Transactions that modify disjoint sets of refs can commit concurrently).
+- [`v5_mvcc_fine_grained_barging.clj`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v5_mvcc_fine_grained_barging.clj): MVCC-based STM with fine-grained locking and barging (transactions eagerly detect write conflicts and try to preempt other transactions. Transactions are prioritized to ensure liveness.)
 
 My primary goal has been clarity of code, not performance. From crude micro-benchmarks,
 my rough estimate is that these meta-circular implementations are 3-6x slower than the 
@@ -32,7 +33,12 @@ STM implementation is based, I suggest studying
 [`version 2`](https://github.com/tvcutsem/stm-in-clojure/blob/master/stm/v2_mvcc.clj). 
 It's less than 200 LOC of Clojure code.
 
-Before loading the example files, make sure you compiled `stm/RetryEx.clj` such that the generated exception class is on the classpath.
+Before loading the example files, make sure you compile `stm/RetryEx.clj` by evaluating
+
+    (compile 'stm.RetryEx)
+    
+This should generate the necessary Java class files in the "classes" directory.
+Then run the examples with this "classes" directory on the JVM classpath.
 
 Slides
 ------
@@ -81,5 +87,5 @@ Feedback
 I welcome any feedback on possible improvements to this code, especially
 with respect to coding style, Clojure idioms, performance improvements, etc.
 
-E-mail can be sent to my `tomvc.be` gmail account, or you can post a message on
+E-mail can be sent to my `tomvc.be` gmail account, or ping me on
 Twitter ([@tvcutsem](http://twitter.com/tvcutsem)).
