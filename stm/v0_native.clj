@@ -1,4 +1,4 @@
-; Copyright (c) 2011, Tom Van Cutsem, Vrije Universiteit Brussel
+; Copyright (c) 2011-2013, Tom Van Cutsem, Vrije Universiteit Brussel
 ; All rights reserved.
 ;
 ; Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 
 ;; MC-STM: meta-circular STM in Clojure
 ;; Multicore Programming
-;; (c) 2011, Tom Van Cutsem
+;; (c) 2011-2013, Tom Van Cutsem
 
 ;; version 0 - Clojure's native STM
 ;; this is just a wrapper around Clojure's native STM, to be able to
