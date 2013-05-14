@@ -65,7 +65,7 @@
 
 ; debugging routine
 ;(set! *print-level* 15)
-(def *tracing* false)
+(def ^:dynamic *tracing* false)
 (defn- trace [& s]
   (if *tracing*
     (.println System/out
