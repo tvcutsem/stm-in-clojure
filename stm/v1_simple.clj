@@ -48,7 +48,7 @@
 
 ; a thread-local var that holds the current transaction executed by this thread
 ; if the thread does not execute a transaction, this is set to nil
-(def *current-transaction* nil)
+(def ^:dynamic *current-transaction* nil)
 
 (def NEXT_TRANSACTION_ID (atom 0))
 
