@@ -1,4 +1,4 @@
-; Copyright (c) 2011-2012, Tom Van Cutsem, Vrije Universiteit Brussel
+; Copyright (c) 2011-2013, Tom Van Cutsem, Vrije Universiteit Brussel
 ; All rights reserved.
 ;
 ; Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 
 ;; MC-STM: meta-circular STM in Clojure
 ;; Multicore Programming
-;; (c) 2011-2012, Tom Van Cutsem
+;; (c) 2011-2013, Tom Van Cutsem
 
 ;; Test the effect of barging on some pathological transactions that
 ;; take long to complete, yet contend for a shared ref
@@ -35,7 +35,7 @@
 ;; http://reinoutstevens.wordpress.com/2011/06/23/extending-stm-with-barging/
 
 (ns test.barging
-  (:use clojure.contrib.test-is)
+  (:use clojure.test)
   (:import (java.util.concurrent Executors)))
 
 ; (use 'stm.v0-native)
