@@ -144,13 +144,16 @@
                 (:read-point tx))
             (tx-retry)))
         
-        ; if validation OK, re-apply all commutes based on its most recent value
+        ; if validation OK, re-apply commutes based on its most recent value
         (doseq [[commuted-ref commute-fns] commuted-refs]
+          ; if a ref has been written to (by set/alter as well as commute),
+          ; its in-transaction-value will be correct so we don't need to set it
+          (when (not (contains? written-refs commuted-ref))
             (swap! (:in-tx-values tx) assoc commuted-ref
               ; apply each commute-fn to the result of the previous commute-fn,
               ; starting with the most recent value
               ((reduce comp identity commute-fns)
-                (:value (most-recent @commuted-ref)))))
+                (:value (most-recent @commuted-ref))))))
 
         (let [in-tx-values @(:in-tx-values tx)
               new-write-point (inc @GLOBAL_WRITE_POINT)]

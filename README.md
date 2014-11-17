@@ -81,6 +81,8 @@ Acknowledgements
 I was inspired by Daniel Spiwak's blog post on [STM in Scala](http://www.codecommit.com/blog/scala/software-transactional-memory-in-scala).
 Thanks also to R. Mark Volkmann for his excellent article on [STM in Clojure](http://java.ociweb.com/mark/stm/article.html).
 
+Thanks to Janwillem Swaelens for finding and fixing a bug related to the implementation of `commute`.
+
 Feedback
 --------
 
